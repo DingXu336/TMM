@@ -1,0 +1,10 @@
+# Core scientific computing
+numpy>=1.20.0
+scipy>=1.7.0
+matplotlib>=3.5.0
+
+# Type checking and validation
+typing-extensions>=4.0.0
+
+# Optional GUI dependencies (installed separately)
+# tkinter is usually included with Python installations 
