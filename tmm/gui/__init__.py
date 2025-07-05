@@ -2,14 +2,15 @@
 GUI module for interactive TMM applications.
 
 This module provides graphical user interfaces for:
-- 2D reflectivity calculations
-- Dispersion analysis
-- Material property visualization
-- Jones matrix analysis
+- Unified 3D E-kx-ky analysis
 """
 
-from .main import main
-from .tmm_gui import TMMGui
-from .dispersion_gui import DispersionGui
+# Import unified Jones GUI (the one that actually exists)
+from .jones_unified_gui import JonesUnifiedGUI
 
-__all__ = ["main", "TMMGui", "DispersionGui"] 
+# TODO: Import other GUI components when they are implemented
+# from .main import main
+# from .tmm_gui import TMMGui
+# from .dispersion_gui import DispersionGui
+
+__all__ = ["JonesUnifiedGUI"] 

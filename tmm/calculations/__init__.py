@@ -2,20 +2,29 @@
 TMM calculations module containing specialized calculators.
 
 This module provides high-level calculation interfaces:
-- TMMCalculator: General TMM calculations
-- ReflectivityCalculator: Reflectivity and transmission calculations
-- DispersionCalculator: Energy/wavelength dispersion calculations
-- PolarizationAnalyzer: Jones matrix and Stokes parameter analysis
+- JonesUnifiedCalculator: Unified 3D E-kx-ky analysis
+- Jones3DAnalyzer: Specialized 3D Jones matrix analyzer
 """
 
-from .tmm_calculator import TMMCalculator
-from .reflectivity_calculator import ReflectivityCalculator
-from .dispersion_calculator import DispersionCalculator
-from .polarization_analyzer import PolarizationAnalyzer
+# Import unified Jones calculator components (the ones that actually exist)
+from .jones_unified_calculator import JonesUnifiedCalculator, CalculationParams, JonesResults, GridResolution
+from .jones_3d_analyzer import Jones3DAnalyzer
+
+# TODO: Import other calculators when they are implemented
+# from .tmm_calculator import TMMCalculator
+# from .reflectivity_calculator import ReflectivityCalculator
+# from .dispersion_calculator import DispersionCalculator
+# from .polarization_analyzer import PolarizationAnalyzer
 
 __all__ = [
-    "TMMCalculator",
-    "ReflectivityCalculator", 
-    "DispersionCalculator",
-    "PolarizationAnalyzer",
+    "JonesUnifiedCalculator",
+    "CalculationParams", 
+    "JonesResults",
+    "GridResolution",
+    "Jones3DAnalyzer",
+    # TODO: Add other calculators when implemented
+    # "TMMCalculator",
+    # "ReflectivityCalculator", 
+    # "DispersionCalculator",
+    # "PolarizationAnalyzer",
 ] 
