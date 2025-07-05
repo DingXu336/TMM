@@ -11,7 +11,6 @@ This document summarizes the comprehensive refactoring of the TMM (Transfer Matr
 ## Original State
 
 The original project consisted of several standalone Python files (now archived in `archive/`):
-- `TMM_2D.py` - Main TMM calculation with GUI
 - `Jones_Xect.py` - Jones matrix cross-section calculations
 - `Jones_disperion.py` - Jones matrix dispersion analysis
 - `Jones_dispersion_unfinished.py` - Incomplete dispersion implementation

@@ -4,7 +4,7 @@ This directory contains the original Python files from the TMM project before re
 
 ## Archived Files
 
-- **`TMM_2D.py`** - Original main TMM calculation script with integrated GUI
+
 - **`Jones_Xect.py`** - Original Jones matrix cross-section calculations
 - **`Jones_disperion.py`** - Original Jones matrix dispersion analysis 
 - **`Jones_dispersion_unfinished.py`** - Incomplete dispersion implementation
@@ -18,7 +18,7 @@ These files have been **completely refactored** into the new modular package str
 
 | Original File | New Location |
 |---------------|--------------|
-| `TMM_2D.py` | → `tmm/core/tmm.py` + `tmm/gui/tmm_gui.py` |
+
 | `Jones_Xect.py` | → `tmm/calculations/polarization_analyzer.py` |
 | `Jones_disperion.py` | → `tmm/calculations/dispersion_calculator.py` |
 | `eps_convert_from_ref-web.py` | → `tmm/utils/converter.py` + `tmm/materials/material_loader.py` |
