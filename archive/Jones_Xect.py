@@ -61,10 +61,10 @@ def rotate_eps_full(eps_tensor, kx, ky):
 # Jones-matrix interface and cascade
 def interface_jones(eps1, eps2, k_par, w):
     # normal components
-    kz1s = np.sqrt(eps1[1,1]*(w/c)**2 - k_par**2 + 0j)
-    kz2s = np.sqrt(eps2[1,1]*(w/c)**2 - k_par**2 + 0j)
-    kz1p = np.sqrt(eps1[0,0]*(w/c)**2 - (eps1[0,0]/eps1[2,2])*k_par**2 + 0j)
-    kz2p = np.sqrt(eps2[0,0]*(w/c)**2 - (eps2[0,0]/eps2[2,2])*k_par**2 + 0j)
+    kz1s = np.sqrt(eps1[0,0]*(w/c)**2 - k_par**2 + 0j)
+    kz2s = np.sqrt(eps2[0,0]*(w/c)**2 - k_par**2 + 0j)
+    kz1p = np.sqrt(eps1[1,1]*(w/c)**2 - (eps1[1,1]/eps1[2,2])*k_par**2 + 0j)
+    kz2p = np.sqrt(eps2[1,1]*(w/c)**2 - (eps2[1,1]/eps2[2,2])*k_par**2 + 0j)
     # admittances
     Ys1 = kz1s/(mu0*w);  Yp1 = eps0*eps1[2,2]*w/kz1p
     Ys2 = kz2s/(mu0*w);  Yp2 = eps0*eps2[2,2]*w/kz2p
@@ -72,11 +72,10 @@ def interface_jones(eps1, eps2, k_par, w):
     # Jones R = (Y2-Y1) @ inv(Y2+Y1)
     return np.linalg.solve(Y2+Y1, Y2-Y1)
 
-def gamma_jones(rj, Gp, phi):
-    I=np.eye(2)
-    exp2 = np.exp(2j*phi)
-    num = rj + Gp*exp2
-    den = I + rj@ (Gp*exp2)
+def gamma_jones(rj, G_prev, P):
+    # P = diag([e^{2iφ_s}, e^{2iφ_p}])
+    num = rj + P @ G_prev @ P
+    den = np.eye(2) + rj @ P @ G_prev @ P
     return np.linalg.solve(den, num)
 
 def calc_r_2d_single(self, E_eV, qstart, qstop, dq, layer_info, a, b, delta_phi_deg):
@@ -90,73 +89,6 @@ def calc_r_2d_single(self, E_eV, qstart, qstop, dq, layer_info, a, b, delta_phi_
 
     layers = build_layers(layer_info, np.array([w_spec]))
     n_ifaces = len(layers) - 1
-
-    #def kz_p(ex, ez, k_par):
-    #    return np.sqrt(ex*(w/c)**2 - (ex/ez)*k_par**2 + 0j)
-    #def kz_s(ey, k_par):
-    #    return np.sqrt(ey*(w/c)**2 - k_par**2 + 0j)
-    #def rp_p(kz1, ex1, kz2, ex2):
-    #    return (kz1*ex2 - kz2*ex1)/(kz1*ex2 + kz2*ex1)
-    #def rp_s(kz1, kz2):
-    #    return (kz1 - kz2)/(kz1 + kz2)
-    #def gamma(rpj, g_prev, kz2, d2):
-    #    return (rpj + g_prev*np.exp(1j*2*kz2*d2)) / (1 + rpj*g_prev*np.exp(1j*2*kz2*d2))
-    
-    #Ny, Nx = Kpar.shape
-    #E_lab_out = np.zeros((Ny, Nx, 3), dtype=complex)
-    #E_rot_out = np.zeros((Ny, Nx, 3), dtype=complex)
-    #Gs = np.zeros((Ny, Nx), dtype=complex)
-    #Gp = np.zeros((Ny, Nx), dtype=complex)
-
-    #delta_phi = np.deg2rad(delta_phi_deg)
-    #E_lab_in = lambda kx, ky: a * np.array([0, 1, 0]) + b * np.exp(1j * delta_phi) * np.array([-1, 0, 0])
-
-    #for iy in range(Ny):
-    #    for ix in range(Nx):
-    #        kx = KX[iy, ix]
-    #        ky = KY[iy, ix]
-    #        k_par = Kpar[iy, ix]
-
-    #        R = local_basis_rotation(kx, ky)
-    #        Ein_lab = E_lab_in(kx, ky)
-    #        Ein_rot = R.T @ Ein_lab 
-
-    #        eps1_mat = rotate_eps_full(layers[-2]['eps'][0,:,0], kx, ky)
-    #        eps2_mat = rotate_eps_full(layers[-1]['eps'][0,:,0], kx, ky)
-    #        ex1, ey1, ez1 = eps1_mat[0,0], eps1_mat[1,1], eps1_mat[2,2]
-    #        ex2, ey2, ez2 = eps2_mat[0,0], eps2_mat[1,1], eps2_mat[2,2]
-
-#            kz1p = kz_p(ex1, ez1, k_par)
-#            kz2p = kz_p(ex2, ez2, k_par)
-#            g_p = rp_p(kz1p, ex1, kz2p, ex2)
-
-#            kz1s = kz_s(ey1, k_par)
-#            kz2s = kz_s(ey2, k_par)
-#            g_s = rp_s(kz1s, kz2s)
-
-#            for iface in range(1, n_ifaces):
-#                j = len(layers) - 1 - iface
-#                if j < 1:
-#                    break
-#                eps1_mat = rotate_eps_full(layers[j-1]['eps'][0,:,0], kx, ky)
-#                eps2_mat = rotate_eps_full(layers[j]['eps'][0,:,0], kx, ky)
-#                ex1, ey1, ez1 = eps1_mat[0,0], eps1_mat[1,1], eps1_mat[2,2]
-#                ex2, ey2, ez2 = eps2_mat[0,0], eps2_mat[1,1], eps2_mat[2,2]
-
-#                kz2p = kz_p(ex2, ez2, k_par)
-#                rpj = rp_p(kz_p(ex1, ez1, k_par), ex1, kz2p, ex2)
-#                g_p = gamma(rpj, g_p, kz2p, layers[j]['d'])
-
-#                kz2s = kz_s(ey2, k_par)
-#                rpj_s = rp_s(kz_s(ey1, k_par), kz2s)
-#                g_s = gamma(rpj_s, g_s, kz2s, layers[j]['d'])
-
-#            Eout_rot = np.array([g_s * Ein_rot[0], g_p * Ein_rot[1], 0])
-#            #Eout_rot = np.array([1 * Ein_rot[0], 1* Ein_rot[1], 0])
-#            E_rot_out[iy, ix] = Eout_rot
-#            E_lab_out[iy, ix] = R @ Eout_rot
-#            Gp[iy, ix] = g_p
-#            Gs[iy, ix] = g_s
 
     Gmnt=np.zeros((Kpar.shape[0],Kpar.shape[1],2,2),dtype=complex)
 
@@ -179,8 +111,11 @@ def calc_r_2d_single(self, E_eV, qstart, qstop, dq, layer_info, a, b, delta_phi_
                 e1=rotate_eps_full(layers[j-1]['eps'][0,:,0],kx,ky)
                 e2=rotate_eps_full(layers[j  ]['eps'][0,:,0],kx,ky)
                 rj=interface_jones(e1,e2,kp,w)
-                kz2p=np.sqrt(e2[0,0]*(w/c)**2 - (e2[0,0]/e2[2,2])*kp**2+0j)
-                G=gamma_jones(rj,G,kz2p*layers[j]['d'])
+                kz_s = np.sqrt(e2[0,0]*(w/c)**2 - kp**2 + 0j)
+                kz_p = np.sqrt(e2[1,1]*(w/c)**2 - (e2[1,1]/e2[2,2])*kp**2 + 0j)
+                φ_s, φ_p = kz_s * layers[j]['d'], kz_p * layers[j]['d']
+                phi_prop = np.diag([np.exp(1j*φ_s), np.exp(1j*φ_p)])
+                G = gamma_jones(rj, G, phi_prop)
             Gmnt[iy,ix]=G
 
     # input field in lab frame

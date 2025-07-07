@@ -53,19 +53,19 @@ def rotate_eps_full(eps_vec, kx, ky):
     return R.T @ eps_mat @ R
 
 def interface_jones(eps1, eps2, k_par, w):
-    kz1s = np.sqrt(eps1[1,1]*(w/c)**2 - k_par**2 + 0j)
-    kz2s = np.sqrt(eps2[1,1]*(w/c)**2 - k_par**2 + 0j)
-    kz1p = np.sqrt(eps1[0,0]*(w/c)**2 - (eps1[0,0]/eps1[2,2])*k_par**2 + 0j)
-    kz2p = np.sqrt(eps2[0,0]*(w/c)**2 - (eps2[0,0]/eps2[2,2])*k_par**2 + 0j)
+    kz1s = np.sqrt(eps1[0,0]*(w/c)**2 - k_par**2 + 0j)
+    kz2s = np.sqrt(eps2[0,0]*(w/c)**2 - k_par**2 + 0j)
+    kz1p = np.sqrt(eps1[1,1]*(w/c)**2 - (eps1[1,1]/eps1[2,2])*k_par**2 + 0j)
+    kz2p = np.sqrt(eps2[1,1]*(w/c)**2 - (eps2[1,1]/eps2[2,2])*k_par**2 + 0j)
     Ys1, Yp1 = kz1s/(mu0*w), eps0*eps1[2,2]*w/kz1p
     Ys2, Yp2 = kz2s/(mu0*w), eps0*eps2[2,2]*w/kz2p
     Y1, Y2 = np.diag([Ys1,Yp1]), np.diag([Ys2,Yp2])
     return np.linalg.solve(Y2+Y1, Y2-Y1)
 
-def gamma_jones(rj, Gp, phi):
-    exp2 = np.exp(2j*phi)
-    num = rj + Gp*exp2
-    den = np.eye(2) + rj @ (Gp*exp2)
+def gamma_jones(rj, G_prev, P):
+    # P is 2×2 diag([e^{2iφ_s}, e^{2iφ_p}])
+    num = rj + P @ G_prev @ P
+    den = np.eye(2) + rj @ P @ G_prev @ P
     return np.linalg.solve(den, num)
 
 # --- Dispersion calculation ---
@@ -100,7 +100,10 @@ def calc_dispersion(layer_info, fixed_axis, fixed_val,
                 if iface == len(layers) - 2:
                     G = rj
                 else:
-                    phi_prop = np.sqrt(e2[0,0]*(w/c)**2 - (e2[0,0]/e2[2,2])*k_par**2 + 0j) * layers[iface+1]['d']
+                    kz_s = np.sqrt(e2[0,0]*(w/c)**2 - k_par**2 + 0j)
+                    kz_p = np.sqrt(e2[1,1]*(w/c)**2 - (e2[1,1]/e2[2,2])*k_par**2 + 0j)
+                    φ_s, φ_p = kz_s * layers[iface+1]['d'], kz_p * layers[iface+1]['d']
+                    phi_prop = np.diag([np.exp(1j*φ_s), np.exp(1j*φ_p)])
                     G = gamma_jones(rj, G, phi_prop)
             # Input polarization
             δ = np.deg2rad(delta_phi_deg)
