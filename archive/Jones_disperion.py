@@ -10,7 +10,7 @@ mu0 = 4e-7 * np.pi
 eps0 = 1/(mu0 * c**2)
 
 # Material database (name -> filepath)
-material_files = {'Air': None, 'SiO2': None}
+material_files = {'Air': None, 'SiO2': None}  # type: dict[str, str | None]
 
 # --- Material routines ---
 def get_material_eps(material, w_cm):
@@ -19,8 +19,10 @@ def get_material_eps(material, w_cm):
     elif material == 'SiO2':
         n = 1.5
         eps = np.full((len(w_cm), 3), n**2, dtype=complex)
-    elif material in material_files and material_files[material]:
-        data = np.loadtxt(material_files[material])
+    elif material in material_files and material_files[material] is not None:
+        filepath = material_files[material]
+        assert filepath is not None  # Type guard for linter
+        data = np.loadtxt(filepath)
         w_data = data[:,0]
         eps = np.zeros((len(w_cm),3), dtype=complex)
         for i, comp in enumerate([1,3,5]):
@@ -105,6 +107,11 @@ def calc_dispersion(layer_info, fixed_axis, fixed_val,
                     φ_s, φ_p = kz_s * layers[iface+1]['d'], kz_p * layers[iface+1]['d']
                     phi_prop = np.diag([np.exp(1j*φ_s), np.exp(1j*φ_p)])
                     G = gamma_jones(rj, G, phi_prop)
+            
+            # Handle case where G is None (shouldn't happen with proper layer structure)
+            if G is None:
+                G = np.zeros((2, 2), dtype=complex)
+            
             # Input polarization
             δ = np.deg2rad(delta_phi_deg)
             Ein_lab = np.array([-b*np.exp(1j*δ), a, 0])
