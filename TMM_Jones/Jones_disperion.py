@@ -75,7 +75,7 @@ def calc_dispersion(layer_info, fixed_axis, fixed_val,
                      E_start, E_stop, q_start, q_stop,
                      a, b, delta_phi_deg):
     # Resolution (can be parameterized later)
-    dE, dq = 0.01, 0.1
+    dE, dq = 0.002, 0.1
     E_vals = np.arange(E_start, E_stop + dE, dE)
     q_vals = np.arange(q_start, q_stop + dq, dq)
     nE, nQ = len(E_vals), len(q_vals)
